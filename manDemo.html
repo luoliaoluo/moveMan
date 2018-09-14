@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        canvas {
+            background: #000;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+<canvas width="600" height="400"></canvas>
+<script>
+    var Person = function (ctx) {
+        this.ctx = ctx || document.querySelector('canvas').getContext('2d');
+        this.src = '04.png';
+    //    画布大小
+        this.canvasWidth = this.ctx.canvas.width;
+        this.canvasHeight = this.ctx.canvas.height;
+    //    一步距离
+        this.stepSzie = 10;
+    //    方向
+        this.direction = 0;
+          /*x轴方向的偏移步数*/
+        this.stepX = 0;
+        /*y轴方向的偏移步数*/
+        this.stepY = 0;
+
+        /*初始化方法*/
+        this.init();
+    }
+    Person.prototype.loadImage = function (callback) {
+        var image = new Image();
+        image.onload = function () {
+            callback && callback(image)
+        }
+        image.src = this.src;
+    }
+    Person.prototype.init = function () {
+        var that = this;
+        this.loadImage(function (image) {
+        //    图片大小
+            that.imageWidth = image.width
+            that.imageHeight = image.height
+        //    人物大小
+            that.personWidth = that.imageWidth / 4
+            that.personHeight = that.imageHeight / 4
+            //绘制图起点
+            that.x0 = that.canvasWidth/2 - that.personWidth/2
+            that.y0 = that.canvasHeight/2 - that.personHeight/2
+            that.ctx.drawImage(image,
+                0,0,
+                that.personWidth, that.personHeight,
+                that.x0, that.y0,
+                that.personWidth, that.personHeight
+            )
+            that.index = 0;
+            document.onkeydown = function (e) {
+                if(e.keyCode == 40){
+                    that.direction = 0
+                    that.stepY++
+                    that.drawImage(image)
+                //    前
+                }else if (e.keyCode == 37 ){
+                    that.direction = 1
+                    that.stepX--
+                    that.drawImage(image)
+                //    左
+                }else if(e.keyCode == 39){
+                    that.direction = 2;
+                    that.stepX ++;
+                    that.drawImage(image)
+                    /*右*/
+                }else if(e.keyCode == 38){
+                    that.direction = 3;
+                    that.stepY --;
+                    that.drawImage(image)
+                    /*后*/
+                }
+            }
+        })
+    }
+    Person.prototype.drawImage = function (image) {
+        this.index++
+        this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight)
+        this.ctx.drawImage(image,
+            this.index * this.personWidth, this.direction * this.personHeight,
+            this.personWidth, this.personHeight,
+            this.x0+this.stepX*this.stepSzie, this.y0+this.stepY*this.stepSzie,
+            this.personWidth, this.personHeight
+        )
+        if(this.index>2){
+            this.index=0
+        }
+    }
+    new Person()
+</script>
+</body>
+</html>
